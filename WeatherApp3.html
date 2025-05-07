@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - Toledo, OH (43623)</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #FFC107;
+            font-family: 'Arial', sans-serif;
+            font-size: clamp(1rem, 1.8vw, 1.2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: auto;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 1vw;
+            width: 95%;
+            max-width: 95vw;
+            padding: 1vw;
+        }
+        .panel {
+            background-color: #1a1a1a;
+            padding: 1vw;
+            border-radius: 0.8vw;
+            text-align: center;
+            min-height: 12vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .left-panel, .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1vw;
+        }
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1vw;
+        }
+        .digital-font {
+            font-family: 'Digital-7', monospace;
+            font-size: clamp(1.6rem, 2.8vw, 2rem);
+            color: #00b7eb;
+            text-shadow: 0 0 0.5vw #00b7eb;
+        }
+        .label {
+            font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+            color: #FFB300;
+            margin-bottom: 0.5vw;
+        }
+        .forecast-circle {
+            width: clamp(12vw, 15vw, 18vw);
+            height: clamp(12vw, 15vw, 18vw);
+            background: radial-gradient(circle, #333, #1a1a1a);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 1vw rgba(0, 183, 235, 0.5);
+        }
+        .landscape {
+            position: absolute;
+            bottom: 0;
+            height: 25%;
+            width: 100%;
+            background-color: #4caf50;
+            opacity: 0.7;
+        }
+        .forecast-icon {
+            font-size: clamp(2.5rem, 4.5vw, 4.5rem);
+            color: #ffeb3b;
+            filter: drop-shadow(0 0 0.8vw #ffeb3b);
+        }
+        .marquee {
+            width: clamp(12vw, 15vw, 18vw);
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .marquee-text {
+            display: inline-block;
+            font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+            color: #00b7eb;
+            padding-left: 100%;
+            transform: translateX(100%);
+            animation: marquee 15s linear infinite;
+            font-family: 'Digital-7', monospace;
+            text-shadow: 0 0 0.5vw #00b7eb;
+        }
+        .alert-marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+        .alert-marquee-text {
+            display: inline-block;
+            font-size: clamp(1.6rem, 2.8vw, 2rem);
+            color: #ff5722;
+            font-weight: bold;
+            padding-left: 100%;
+            transform: translateX(100%);
+            animation: marquee 15s linear infinite;
+            font-family: 'Digital-7', monospace;
+            text-shadow: 0 0 0.5vw #ff5722;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .icon {
+            font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+            margin: 0.3vw;
+        }
+        @media (max-width: 800px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 2vw;
+                padding: 2vw;
+            }
+            .panel {
+                min-height: 20vw;
+                padding: 2vw;
+            }
+            .forecast-circle {
+                width: clamp(20vw, 25vw, 30vw);
+                height: clamp(20vw, 25vw, 30vw);
+            }
+            .marquee {
+                width: 100%;
+            }
+            .digital-font {
+                font-size: clamp(1.4rem, 3.5vw, 1.8rem);
+            }
+            .label {
+                font-size: clamp(0.6rem, 1.8vw, 0.8rem);
+            }
+            .forecast-icon {
+                font-size: clamp(2rem, 5.5vw, 3rem);
+            }
+            .marquee-text {
+                font-size: clamp(1rem, 2.8vw, 1.4rem);
+            }
+            .alert-marquee-text {
+                font-size: clamp(1.4rem, 3.5vw, 1.8rem);
+            }
+            .icon {
+                font-size: clamp(0.8rem, 2vw, 1rem);
+            }
+            body {
+                font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+            }
+        }
+        @media (max-width: 500px) {
+            .digital-font {
+                font-size: clamp(1.2rem, 4vw, 1.6rem);
+            }
+            .label {
+                font-size: clamp(0.5rem, 2.2vw, 0.7rem);
+            }
+            .forecast-icon {
+                font-size: clamp(1.8rem, 6vw, 2.5rem);
+            }
+            .marquee-text {
+                font-size: clamp(0.9rem, 3.2vw, 1.2rem);
+            }
+            .alert-marquee-text {
+                font-size: clamp(1.2rem, 4vw, 1.6rem);
+            }
+            .icon {
+                font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+            }
+            body {
+                font-size: clamp(0.8rem, 2.5vw, 1rem);
+            }
+        }
+        @font-face {
+            font-family: 'Digital-7';
+            src: url('https://db.onlinewebfonts.com/t/3f6c641b7ec402a2ee07ea4c3fb39087.woff') format('woff');
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="panel">
+                <div class="label">Temperature</div>
+                <div class="digital-font" id="temperature">--°F</div>
+                <span class="icon">🌡️</span>
+            </div>
+            <div class="panel">
+                <div class="label">Humidity</div>
+                <div class="digital-font" id="humidity">--%</div>
+                <span class="icon">💧</span>
+            </div>
+            <div class="panel">
+                <div class="label">Pressure</div>
+                <div class="digital-font" id="pressure">-- inHg</div>
+                <span class="icon">🌬️</span>
+            </div>
+        </div>
+        <div class="center-panel">
+            <div class="panel">
+                <div class="label">Current Time</div>
+                <div class="digital-font" id="current-time">--:--</div>
+            </div>
+            <div class="forecast-circle">
+                <div class="landscape"></div>
+                <span class="forecast-icon" id="current-condition-icon">☀️</span>
+            </div>
+            <div class="panel marquee">
+                <div class="label">Tomorrow</div>
+                <div class="marquee-text" id="tomorrow-forecast">Loading...</div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="panel">
+                <div class="label">Wind</div>
+                <div class="digital-font" id="wind-info">--</div>
+            </div>
+            <div class="panel">
+                <div class="label">Alerts</div>
+                <div id="alerts-container">
+                    <div class="digital-font" id="alerts-static" style="display: none;">None</div>
+                    <div class="alert-marquee-text" id="alerts-scrolling" style="display: none;">None</div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="label">Dew Point</div>
+                <div class="digital-font" id="dew-point">--°F</div>
+                <span class="icon">💦</span>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Configuration
+        const CONFIG = {
+            apiBaseUrl: 'https://api.weather.gov',
+            proxyUrl: 'https://api.allorigins.win/raw?url=',
+            userAgent: 'WeatherApp/1.0 (michaelschumacker@gmail.com)',
+            fetchTimeout: 5000,
+            updateInterval: 600000,
+            fallbackCoords: { latitude: 41.7, longitude: -83.65 }, // Toledo, OH
+            alertZone: 'OHZ003'
+        };
+
+        // Fallback data
+        const FALLBACK_DATA = {
+            temperature: '65°F',
+            humidity: '70%',
+            pressure: '29.92 inHg',
+            dewPoint: '60°F',
+            windSpeed: '10',
+            windDirection: 180,
+            conditionText: 'Overcast',
+            conditionIcon: '☁️',
+            alerts: 'None',
+            tomorrowForecast: 'Cloudy, 40% chance of rain, High: 70°F, Low: 55°F'
+        };
+
+        // Fetch with timeout
+        async function fetchWithTimeout(url, options) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), CONFIG.fetchTimeout);
+            try {
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                clearTimeout(timeoutId);
+                throw error;
+            }
+        }
+
+        // Get geolocation
+        async function getLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation not supported by browser'));
+                }
+                navigator.geolocation.getCurrentPosition(
+                    position => resolve(position.coords),
+                    error => reject(error)
+                );
+            });
+        }
+
+        // Convert wind direction degrees to text
+        function getDirectionFromDegrees(degrees) {
+            const directions = [
+                'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE',
+                'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'
+            ];
+            const index = Math.round(degrees / 22.5) % 16;
+            return directions[index] || 'VAR';
+        }
+
+        // Map observation text to emoji icon
+        function getWeatherIcon(description) {
+            description = description.toLowerCase();
+            console.log('NWS textDescription:', description); // Debug log
+            if (description.includes('overcast') || description.includes('cloudy') || description.includes('mostly cloudy')) return '☁️';
+            if (description.includes('sunny') || description.includes('clear') || description.includes('fair')) return '☀️';
+            if (description.includes('partly cloudy') || description.includes('partly sunny') || description.includes('few clouds')) return '🌤️';
+            if (description.includes('rain') || description.includes('showers') || description.includes('drizzle')) return '🌧️';
+            if (description.includes('snow') || description.includes('flurries')) return '❄️';
+            if (description.includes('thunder') || description.includes('storm')) return '⛈️';
+            if (description.includes('fog') || description.includes('mist')) return '🌫️';
+            if (description.includes('sleet') || description.includes('ice pellets')) return '🌨️';
+            if (description.includes('haze') || description.includes('smoke') || description.includes('dust')) return '🌫️';
+            if (description.includes('freezing rain')) return '🌧️❄️';
+            return '☁️'; // Default to overcast
+        }
+
+        // Get tomorrow's date (YYYY-MM-DD)
+        function getTomorrowDate() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            return tomorrow.toISOString().split('T')[0];
+        }
+
+        // Set marquee animation speed to 5 characters per second
+        function setMarqueeSpeed(element, text) {
+            if (element && text) {
+                const textLength = text.length;
+                const speed = 5; // Characters per second
+                const duration = textLength / speed; // Duration in seconds
+                element.style.animationDuration = `${Math.max(duration, 5)}s`; // Minimum 5s to avoid too-fast scrolls
+            }
+        }
+
+        // Fetch weather data
+        async function fetchWeatherData(latitude, longitude) {
+            try {
+                // Get point data
+                const pointUrl = `${CONFIG.proxyUrl}${encodeURIComponent(`${CONFIG.apiBaseUrl}/points/${latitude},${longitude}`)}`;
+                const pointData = await fetchWithTimeout(pointUrl, { headers: { 'User-Agent': CONFIG.userAgent } });
+                const { observationStations, forecast } = pointData.properties;
+                console.log('Point data:', pointData); // Debug log
+
+                // Get observation from nearest station
+                const stationsUrl = `${CONFIG.proxyUrl}${encodeURIComponent(observationStations)}`;
+                const stationsData = await fetchWithTimeout(stationsUrl, { headers: { 'User-Agent': CONFIG.userAgent } });
+                const stationId = stationsData.features[0].properties.stationIdentifier;
+                const observationUrl = `${CONFIG.proxyUrl}${encodeURIComponent(`${CONFIG.apiBaseUrl}/stations/${stationId}/observations/latest`)}`;
+                const observationData = await fetchWithTimeout(observationUrl, { headers: { 'User-Agent': CONFIG.userAgent } });
+                const current = observationData.properties;
+                console.log('Observation data:', current); // Debug log
+
+                // Get tomorrow's forecast
+                let tomorrowForecast = 'Unknown';
+                try {
+                    const forecastUrl = `${CONFIG.proxyUrl}${encodeURIComponent(forecast)}`;
+                    const forecastData = await fetchWithTimeout(forecastUrl, { headers: { 'User-Agent': CONFIG.userAgent } });
+                    console.log('Forecast data:', forecastData); // Debug log
+                    const periods = forecastData.properties.periods;
+                    const tomorrowDate = getTomorrowDate();
+                    // Find periods for tomorrow (daytime and nighttime)
+                    const tomorrowPeriods = periods.filter(p => p.startTime.startsWith(tomorrowDate));
+                    if (tomorrowPeriods.length > 0) {
+                        const daytime = tomorrowPeriods.find(p => p.isDaytime) || tomorrowPeriods[0];
+                        const nighttime = tomorrowPeriods.find(p => !p.isDaytime) || daytime;
+                        tomorrowForecast = `${daytime.shortForecast}, ${daytime.probabilityOfPrecipitation.value || 0}% chance of precipitation, High: ${daytime.temperature}${daytime.temperatureUnit}, Low: ${nighttime.temperature}${nighttime.temperatureUnit}`;
+                    } else {
+                        console.warn('No periods found for tomorrow, using fallback period');
+                        const fallbackPeriod = periods[1] || periods[0];
+                        tomorrowForecast = `${fallbackPeriod.shortForecast}, ${fallbackPeriod.probabilityOfPrecipitation.value || 0}% chance of precipitation, High: ${fallbackPeriod.temperature}${fallbackPeriod.temperatureUnit}`;
+                    }
+                } catch (forecastError) {
+                    console.error('Error fetching forecast:', forecastError);
+                    tomorrowForecast = FALLBACK_DATA.tomorrowForecast;
+                }
+
+                // Get alerts
+                let alertsText = 'None';
+                let hasAlerts = false;
+                try {
+                    const alertsUrl = `${CONFIG.proxyUrl}${encodeURIComponent(`${CONFIG.apiBaseUrl}/alerts/active/zone/${CONFIG.alertZone}`)}`;
+                    const alertsData = await fetchWithTimeout(alertsUrl, { headers: { 'User-Agent': CONFIG.userAgent } });
+                    if (alertsData.features.length > 0) {
+                        alertsText = alertsData.features
+                            .map(alert => `${alert.properties.event}: ${alert.properties.description.replace(/\n/g, ' ').slice(0, 200)}...`)
+                            .join(' | ');
+                        hasAlerts = true;
+                    }
+                } catch (alertError) {
+                    console.error('Error fetching alerts:', alertError);
+                    alertsText = 'None';
+                    hasAlerts = false;
+                }
+
+                // Update UI with null checks
+                const elements = {
+                    temperature: document.getElementById('temperature'),
+                    humidity: document.getElementById('humidity'),
+                    pressure: document.getElementById('pressure'),
+                    dewPoint: document.getElementById('dew-point'),
+                    windInfo: document.getElementById('wind-info'),
+                    conditionText: document.getElementById('condition-text'),
+                    currentConditionIcon: document.getElementById('current-condition-icon'),
+                    tomorrowForecast: document.getElementById('tomorrow-forecast'),
+                    alertsStatic: document.getElementById('alerts-static'),
+                    alertsScrolling: document.getElementById('alerts-scrolling')
+                };
+
+                if (elements.temperature) elements.temperature.textContent = `${Math.round(current.temperature.value * 9 / 5 + 32)}°F`;
+                if (elements.humidity) elements.humidity.textContent = `${Math.round(current.relativeHumidity.value)}%`;
+                if (elements.pressure) elements.pressure.textContent = `${(current.barometricPressure.value / 3386.39).toFixed(2)} inHg`;
+                if (elements.dewPoint) elements.dewPoint.textContent = `${Math.round(current.dewpoint.value * 9 / 5 + 32)}°F`;
+
+                const windSpeedRaw = current.windSpeed.value || 0;
+                const windSpeed = Math.round(windSpeedRaw);
+                if (elements.windInfo) {
+                    if (windSpeedRaw < 0 || windSpeedRaw > 50) {
+                        elements.windInfo.textContent = `${getDirectionFromDegrees(FALLBACK_DATA.windDirection)} at ${FALLBACK_DATA.windSpeed}`;
+                    } else {
+                        const windDirection = current.windDirection.value || 0;
+                        elements.windInfo.textContent = `${getDirectionFromDegrees(windDirection)} at ${windSpeed}`;
+                    }
+                }
+
+                const conditionText = current.textDescription || 'Unknown';
+                if (elements.conditionText) elements.conditionText.textContent = conditionText;
+                if (elements.currentConditionIcon) elements.currentConditionIcon.textContent = getWeatherIcon(conditionText);
+
+                if (elements.tomorrowForecast) {
+                    elements.tomorrowForecast.textContent = tomorrowForecast;
+                    setMarqueeSpeed(elements.tomorrowForecast, tomorrowForecast);
+                }
+
+                if (elements.alertsStatic && elements.alertsScrolling) {
+                    elements.alertsStatic.style.display = hasAlerts ? 'none' : 'block';
+                    elements.alertsScrolling.style.display = hasAlerts ? 'block' : 'none';
+                    if (hasAlerts) {
+                        elements.alertsScrolling.textContent = alertsText;
+                        setMarqueeSpeed(elements.alertsScrolling, alertsText);
+                    } else {
+                        elements.alertsStatic.textContent = 'None';
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+                // Apply fallback data with null checks
+                const elements = {
+                    temperature: document.getElementById('temperature'),
+                    humidity: document.getElementById('humidity'),
+                    pressure: document.getElementById('pressure'),
+                    dewPoint: document.getElementById('dew-point'),
+                    windInfo: document.getElementById('wind-info'),
+                    conditionText: document.getElementById('condition-text'),
+                    currentConditionIcon: document.getElementById('current-condition-icon'),
+                    tomorrowForecast: document.getElementById('tomorrow-forecast'),
+                    alertsStatic: document.getElementById('alerts-static'),
+                    alertsScrolling: document.getElementById('alerts-scrolling')
+                };
+
+                if (elements.temperature) elements.temperature.textContent = FALLBACK_DATA.temperature;
+                if (elements.humidity) elements.humidity.textContent = FALLBACK_DATA.humidity;
+                if (elements.pressure) elements.pressure.textContent = FALLBACK_DATA.pressure;
+                if (elements.dewPoint) elements.dewPoint.textContent = FALLBACK_DATA.dewPoint;
+                if (elements.windInfo) elements.windInfo.textContent = `${getDirectionFromDegrees(FALLBACK_DATA.windDirection)} at ${FALLBACK_DATA.windSpeed}`;
+                if (elements.conditionText) elements.conditionText.textContent = FALLBACK_DATA.conditionText;
+                if (elements.currentConditionIcon) elements.currentConditionIcon.textContent = FALLBACK_DATA.conditionIcon;
+                if (elements.tomorrowForecast) {
+                    elements.tomorrowForecast.textContent = FALLBACK_DATA.tomorrowForecast;
+                    setMarqueeSpeed(elements.tomorrowForecast, FALLBACK_DATA.tomorrowForecast);
+                }
+                if (elements.alertsStatic && elements.alertsScrolling) {
+                    elements.alertsStatic.style.display = 'block';
+                    elements.alertsScrolling.style.display = 'none';
+                    elements.alertsStatic.textContent = FALLBACK_DATA.alerts;
+                }
+            }
+        }
+
+        // Update current time
+        function updateTime() {
+            const currentTime = document.getElementById('current-time');
+            if (currentTime) {
+                const now = new Date();
+                const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                currentTime.textContent = time;
+            }
+        }
+
+        // Initialize app
+        function initialize() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            try {
+                getLocation().then(coords => fetchWeatherData(coords.latitude, coords.longitude)).catch(error => {
+                    console.error('Error initializing, using fallback coords:', error);
+                    fetchWeatherData(CONFIG.fallbackCoords.latitude, CONFIG.fallbackCoords.longitude);
+                });
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                fetchWeatherData(CONFIG.fallbackCoords.latitude, CONFIG.fallbackCoords.longitude);
+            }
+            setInterval(() => fetchWeatherData(CONFIG.fallbackCoords.latitude, CONFIG.fallbackCoords.longitude), CONFIG.updateInterval);
+        }
+
+        // Run after DOM is loaded
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>
